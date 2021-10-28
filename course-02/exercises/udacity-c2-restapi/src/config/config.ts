@@ -36,5 +36,8 @@ export const config = {
     "database": "udagram_prod",
     "host": "",
     "dialect": "postgres"
+  },
+  "jwt": {
+    "sercret": "helloworld"
   }
 }
