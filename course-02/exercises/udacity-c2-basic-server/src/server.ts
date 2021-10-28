@@ -68,15 +68,88 @@ import { Car, cars as cars_list } from './cars';
                 .send(`Welcome to the Cloud, ${name}!`);
   } );
 
-  // @TODO Add an endpoint to GET a list of cars
+  // Add an endpoint to GET a list of cars
   // it should be filterable by make with a query paramater
+  app.get("/cars/",
+    async ( req: Request, res: Response) => {
 
-  // @TODO Add an endpoint to get a specific car
+      let { make } = req.query;
+      
+      if (!make) {
+        return res.status(200)
+          .send(cars)
+      }
+      else {
+        var result = []
+        for (var i=0 ; i < cars_list.length ; i++) {
+          if (cars_list[i]['make'] == make) {
+            result.push(cars_list[i])
+          }
+        }
+      }
+      
+      if (result == []) {
+        return res.status(400)
+          .send("Make of cars doesn't exist")
+      }
+      else {
+        return res.status(200)
+          .send(result)
+      }
+
+    
+  } );
+
+  // Add an endpoint to get a specific car
   // it should require id
   // it should fail gracefully if no matching car is found
+  app.get("/cars/:id",
+    async(req: Request, res: Response) => {
+      let { id } = req.params
 
-  /// @TODO Add an endpoint to post a new car to our list
+      if(!id){
+        return res.status(400)
+          .send("No car id in path")
+      }
+      else {
+        var result = null
+        for (var i=0; i < cars_list.length; i++) {
+          if (cars_list[i]['id'] == parseInt(id)) {
+            result = cars_list[i]
+          }
+        }
+      }
+
+      if (result == null) {
+        return res.status(404)
+          .send("id doesn't exist")
+      }
+      else {
+        return res.status(200)
+          .send(result)
+      }
+    }
+  );
+
+  /// Add an endpoint to post a new car to our list
   // it should require id, type, model, and cost
+  app.post("/cars",
+    async(req: Request, res: Response) => {
+      const { id, type, model, cost, make} = req.body;
+      
+      if(!id || !type || !model || !cost || !make){
+        return res.status(400)
+          .send('body incomplete')
+      }
+
+      var newCar: Car = {id: id, type: type, model: model, cost:cost, make: make}
+      cars_list.push(newCar)
+
+      return res.status(200)
+        .send("successful")
+      
+    }
+  );
 
   // Start the Server
   app.listen( port, () => {
